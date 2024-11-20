@@ -3,36 +3,33 @@
     class="h-screen flex flex-col justify-center items-center relative text-center overflow-hidden"
   >
     <!-- Background abstrait -->
-    <div class="absolute inset-0">
-      <div
-        class="bg-gradient-to-r from-[#f0f4ff] to-[#e8eeff] dark:from-[#252a38] dark:to-[#1c1e26] w-full h-full"
-      ></div>
+    <div ref="background" class="absolute inset-0 w-full h-full">
       <!-- Formes abstraites -->
       <div
-        class="absolute top-10 left-20 w-96 h-96 bg-gradient-to-r from-blue-300 to-indigo-300 dark:from-blue-800 dark:to-indigo-500 rounded-full blur-3xl opacity-30"
+        ref="shapeTop"
+        class="absolute top-10 left-20 w-96 h-96 bg-gradient-to-r from-blue-300 to-indigo-300 dark:from-blue-800 dark:to-indigo-500 rounded-full blur-3xl"
       ></div>
       <div
-        class="absolute bottom-10 right-20 w-96 h-96 bg-gradient-to-r from-blue-300 to-indigo-300 dark:from-blue-800 dark:to-indigo-500 rounded-full blur-3xl opacity-30"
+        ref="shapeBottom"
+        class="absolute bottom-10 right-20 w-96 h-96 bg-gradient-to-r from-blue-300 to-indigo-300 dark:from-blue-800 dark:to-indigo-500 rounded-full blur-3xl"
       ></div>
     </div>
 
     <!-- Contenu principal -->
-    <div class="z-10 text-black dark:text-white">
-      <h1 class="text-4xl md:text-6xl font-extrabold">
+    <div ref="content" class="z-10 text-black dark:text-white">
+      <h1 class="text-4xl md:text-6xl font-extrabold font-raleway">
         HEY, JE SUIS
-        <span class="text-blue-600 dark:text-blue-400">LUCAS FERNANDES</span
-        ><br />
+        <span class="text-blue-600 dark:text-blue-400">LUCAS FERNANDES</span>
+        <br />
       </h1>
-      <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 font-quicksand">
         Je suis développeur web freelance JS/TS<br />
         & passionné par l'entrepreneuriat.
       </p>
-
-      <!-- Boutons -->
       <div class="mt-8 flex justify-center space-x-8">
         <router-link
           to="/projects"
-          class="text-blue-600 dark:text-blue-400 text-lg flex items-center group relative"
+          class="text-blue-600 dark:text-blue-400 text-lg flex items-center group relative font-quicksand"
         >
           <svg
             class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2"
@@ -52,7 +49,7 @@
         </router-link>
         <router-link
           to="/about"
-          class="text-blue-600 dark:text-blue-400 text-lg flex items-center group relative"
+          class="text-blue-600 dark:text-blue-400 text-lg flex items-center group relative font-quicksand"
         >
           <svg
             class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2"
@@ -76,26 +73,82 @@
 </template>
 
 <script>
+import gsap from "gsap";
+
 export default {
   name: "Home",
+  data() {
+    return {
+      isDarkMode: false, // Contrôle le mode sombre
+    };
+  },
+  mounted() {
+    this.detectTheme();
+
+    // Surveille les changements de mode clair/sombre
+    const observer = new MutationObserver(() => {
+      this.detectTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"], // Surveille les changements de classe sur l'élément HTML
+    });
+  },
+  methods: {
+    detectTheme() {
+      this.isDarkMode = document.documentElement.classList.contains("dark");
+      this.animateModeChange();
+    },
+    animateModeChange() {
+      // Animation de l'arrière-plan (durée réduite à 1s)
+      gsap.to(this.$refs.background, {
+        duration: 1,
+        background: this.isDarkMode
+          ? "linear-gradient(to right, #252a38, #1c1e26)"
+          : "linear-gradient(to right, #f0f4ff, #e8eeff)",
+      });
+
+      // Animation des formes abstraites (durée 1.2s)
+      gsap.to(this.$refs.shapeTop, {
+        duration: 1.2,
+        opacity: this.isDarkMode ? 0.3 : 1,
+        scale: this.isDarkMode ? 1.2 : 1,
+        ease: "power2.out",
+      });
+
+      gsap.to(this.$refs.shapeBottom, {
+        duration: 1.2,
+        opacity: this.isDarkMode ? 0.3 : 1,
+        scale: this.isDarkMode ? 1.2 : 1,
+        ease: "power2.out",
+      });
+
+      // Animation du texte (durée 0.8s)
+      gsap.to(this.$refs.content, {
+        duration: 0.8,
+        color: this.isDarkMode ? "#ffffff" : "#000000",
+        ease: "power2.out",
+      });
+    },
+  },
 };
 </script>
 
 <style scoped>
-/* Styles supplémentaires pour ajuster le design */
-h1 span {
-  color: #2563eb; /* Couleur bleue plus foncée pour le mode clair */
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@800&family=Quicksand:wght@400;500&display=swap");
+
+/* Ajoutez ici le style par défaut de l'arrière-plan */
+div[ref="background"] {
+  background: linear-gradient(to right, #f0f4ff, #e8eeff);
+  transition: background 0.3s ease;
 }
 
-.dark h1 span {
-  color: #3b82f6; /* Couleur bleue d'origine pour le mode sombre */
+.font-raleway {
+  font-family: "Raleway", sans-serif;
 }
 
-p {
-  color: #4b5563; /* Couleur grise plus foncée pour le mode clair */
-}
-
-.dark p {
-  color: #a5a9b3; /* Couleur grise d'origine pour le mode sombre */
+.font-quicksand {
+  font-family: "Quicksand", sans-serif;
 }
 </style>
